@@ -30,7 +30,7 @@ def parse_args():
         choices=["F5TTS_v1_Base", "F5TTS_Base", "E2TTS_Base"],
         help="Experiment name",
     )
-    parser.add_argument("--dataset_name", type=str, default="Emilia_ZH_EN", help="Name of the dataset to use")
+    parser.add_argument("--dataset_name", type=str, default="vivoice", help="Name of the dataset to use")
     parser.add_argument("--learning_rate", type=float, default=1e-5, help="Learning rate for training")
     parser.add_argument("--batch_size_per_gpu", type=int, default=3200, help="Batch size per GPU")
     parser.add_argument(
@@ -52,7 +52,7 @@ def parse_args():
     parser.add_argument("--finetune", action="store_true", help="Use Finetune")
     parser.add_argument("--pretrain", type=str, default=None, help="the path to the checkpoint")
     parser.add_argument(
-        "--tokenizer", type=str, default="pinyin", choices=["pinyin", "char", "custom"], help="Tokenizer type"
+        "--tokenizer", type=str, default="char", choices=["pinyin", "char", "custom"], help="Tokenizer type"
     )
     parser.add_argument(
         "--tokenizer_path",
