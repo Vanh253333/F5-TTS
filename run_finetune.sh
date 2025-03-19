@@ -15,18 +15,31 @@ NUM_WOKERS=8
 WARMUP_UPDATES=40000
 SAVE_UPDATES=10000
 LAST_UPDATES=10000
-PRETRAIN_CKPT="ckpts/your_training_dataset/pretrained_model_1200000.pt"
+# Bản .safetensors  load_checkpoint bị lỗi safetensorerror: error while deserializing header: headertoolarge, nên dùng bản .pt cũ
+PRETRAIN_CKPT="ckpts/vivoice/pretrained_model_1250000.safetensors"
 
-stage=5
-stop_stage=5
 
-if [ $stage -le 4 ] && [ $stop_stage -ge 4 ]; then
+stage=1
+stop_stage=1
+
+if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
+    log "Normalize text and save to metadata.csv ... "
+    python prepare_metadata.py 
+fi
+
+if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
     log "Feature extraction ... "
     python src/f5_tts/train/datasets/prepare_vivoice.py "$DATASET_DIR" "$DATASET_DIR" --workers "$NUM_WOKERS"
 fi
 
+# Mở rộng embedding của mô hình pretrained để hỗ trợ bộ từ vựng mới
+if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
+    log "Extend embedding pretrained with new vocab ... "
+    python extend_embedding_vocab.py
+fi
+
 # Chạy quá trình fine-tuning
-if [ $stage -le 5 ] && [ $stop_stage -ge 5 ]; then
+if [ $stage -le 3 ] && [ $stop_stage -ge 3 ]; then
     log "Start fine-tuning F5-TTS with your dataset ... "
     python src/f5_tts/train/finetune_cli.py \
         --exp_name "$EXP_NAME" \

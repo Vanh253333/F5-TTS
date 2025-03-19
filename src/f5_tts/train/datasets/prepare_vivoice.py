@@ -19,9 +19,9 @@ def main():
     with open(meta_info, "r") as f:
         lines = f.readlines()
         for line in tqdm(lines):
-            uttr, text, norm_text = line.split("|")
+            uttr, norm_text = line.split("|")
             norm_text = norm_text.strip()
-            wav_path = Path(dataset_dir) / "wavs" / f"{uttr}.wav"
+            wav_path = Path(dataset_dir) / f"{uttr}"
             duration = sf.info(wav_path).duration
             if duration < 0.4 or duration > 30:
                 continue
@@ -63,3 +63,7 @@ if __name__ == "__main__":
     print(f"\nPrepare for {dataset_name}, will save to {save_dir}\n")
 
     main()
+
+# For vivoice_char, sample count: 887749
+# For vivoice_char, vocab size is: 105
+# For vivoice_char, total 1017.37 hours
