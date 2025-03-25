@@ -17,6 +17,7 @@ from f5_tts.eval.utils_eval import (
     get_inference_prompt,
     get_librispeech_test_clean_metainfo,
     get_seedtts_testset_metainfo,
+    get_infore1_testset_metainfo,
 )
 from f5_tts.infer.utils_infer import load_checkpoint, load_vocoder
 from f5_tts.model import CFM, DiT, UNetT  # noqa: F401. used for config
@@ -91,6 +92,9 @@ def main():
         metalst = rel_path + "/data/seedtts_testset/en/meta.lst"
         metainfo = get_seedtts_testset_metainfo(metalst)
 
+    elif testset == "infore1_25hours":
+        metalst = rel_path + "/data/infore1_25hours/metadata.lst"
+        metainfo = get_infore1_testset_metainfo(metalst)
     # path to save genereted wavs
     output_dir = (
         f"{rel_path}/"
@@ -149,6 +153,9 @@ def main():
     if not os.path.exists(ckpt_path):
         print("Loading from self-organized training checkpoints rather than released pretrained.")
         ckpt_path = rel_path + f"/{model_cfg.ckpts.save_dir}/model_{ckpt_step}.pt"
+        if not os.path.exists(ckpt_path):
+            ckpt_path = rel_path + f"/ckpts/model_{ckpt_step}.pt"
+                    
     dtype = torch.float32 if mel_spec_type == "bigvgan" else None
     model = load_checkpoint(model, ckpt_path, device, dtype=dtype, use_ema=use_ema)
 

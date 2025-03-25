@@ -14,6 +14,20 @@ from f5_tts.model.modules import MelSpec
 from f5_tts.model.utils import convert_char_to_pinyin
 
 
+def get_infore1_testset_metainfo(metalst):
+    f = open(metalst)
+    lines = f.readlines()
+    f.close()
+    metainfo = []
+    for line in lines:
+        if len(line.strip().split("|")) == 4:
+            utt, prompt_text, prompt_wav, gt_text = line.strip().split("|")
+            gt_wav = os.path.join(os.path.dirname(metalst), "wavs", utt)
+        if not os.path.isabs(prompt_wav):
+            prompt_wav = os.path.join(os.path.dirname(metalst), "wavs", prompt_wav)
+        metainfo.append((utt, prompt_text, prompt_wav, gt_text, gt_wav))
+    return metainfo
+
 # seedtts testset metainfo: utt, prompt_text, prompt_wav, gt_text, gt_wav
 def get_seedtts_testset_metainfo(metalst):
     f = open(metalst)
@@ -72,7 +86,7 @@ def padded_mel_batch(ref_mels):
 def get_inference_prompt(
     metainfo,
     speed=1.0,
-    tokenizer="pinyin",
+    tokenizer="char",
     polyphone=True,
     target_sample_rate=24000,
     n_fft=1024,
@@ -148,9 +162,14 @@ def get_inference_prompt(
 
         # deal with batch
         assert infer_batch_size > 0, "infer_batch_size should be greater than 0."
-        assert (
-            min_tokens <= total_mel_len <= max_tokens
-        ), f"Audio {utt} has duration {total_mel_len*hop_length//target_sample_rate}s out of range [{min_secs}, {max_secs}]."
+        # assert (
+        #     min_tokens <= total_mel_len <= max_tokens
+        # ), f"Audio {utt} has duration {total_mel_len*hop_length//target_sample_rate}s out of range [{min_secs}, {max_secs}]."
+
+        if not (min_tokens <= total_mel_len <= max_tokens):
+            print(f"Skipping audio {utt} with duration {total_mel_len * hop_length // target_sample_rate}s out of range [{min_secs}, {max_secs}].")
+            continue
+        
         bucket_i = math.floor((total_mel_len - min_tokens) / (max_tokens - min_tokens + 1) * num_buckets)
 
         utts[bucket_i].append(utt)
