@@ -310,7 +310,7 @@ def load_asr_model(lang, ckpt_dir=""):
             # spk_model = os.path.join(ckpt_dir, "cam++"),
             disable_update=True,
         )  # following seed-tts setting
-    elif lang == "en":
+    elif lang == "en" or lang == "vi":
         from faster_whisper import WhisperModel
 
         model_size = "large-v3" if ckpt_dir == "" else ckpt_dir
@@ -328,7 +328,7 @@ def run_asr_wer(args):
         import zhconv
 
         torch.cuda.set_device(rank)
-    elif lang == "en":
+    elif lang == "en" or lang == "vi":
         os.environ["CUDA_VISIBLE_DEVICES"] = str(rank)
     else:
         raise NotImplementedError(
@@ -349,8 +349,8 @@ def run_asr_wer(args):
             res = asr_model.generate(input=gen_wav, batch_size_s=300, disable_pbar=True)
             hypo = res[0]["text"]
             hypo = zhconv.convert(hypo, "zh-cn")
-        elif lang == "en":
-            segments, _ = asr_model.transcribe(gen_wav, beam_size=5, language="en")
+        elif lang == "en" or lang == "vi":
+            segments, _ = asr_model.transcribe(gen_wav, beam_size=5, language=lang)
             hypo = ""
             for segment in segments:
                 hypo = hypo + " " + segment.text
