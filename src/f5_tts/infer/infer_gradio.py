@@ -45,7 +45,7 @@ DEFAULT_TTS_MODEL = "F5-TTS"
 tts_model_choice = DEFAULT_TTS_MODEL
 
 DEFAULT_TTS_MODEL_CFG = [
-    "hf://vanh10101/F5-TTS-VI/model_176000.pt",
+    "hf://vanh10101/F5-TTS-VI/model_186000.pt",
     "data/vivoice_char/vocab.txt",
     json.dumps(dict(dim=1024, depth=22, heads=16, ff_mult=2, text_dim=512, conv_layers=4, text_mask_padding=False, pe_attn_head=1)),
 ]
